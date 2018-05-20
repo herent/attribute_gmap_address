@@ -7,6 +7,6 @@
   },
   "minimum-stability": "dev",
   "support": {
-    "source": "https://github.com/hereNT/attribute-gmap-address/src"
+    "source": "https://github.com/herent/attribute_gmap_address"
   }
 }
