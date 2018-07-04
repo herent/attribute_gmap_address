@@ -37,6 +37,15 @@ class Controller extends AttributeTypeController
         return $args;
     }
 
+    public function searchKeywords($keywords, $queryBuilder)
+    {
+        $h = $this->attributeKey->getAttributeKeyHandle();
+
+        return $queryBuilder->expr()->orX(
+            $queryBuilder->expr()->like("ak_{$h}_address", ':keywords')
+        );
+    }
+
     public function getIconFormatter()
     {
         return new FontAwesomeIconFormatter('map-marker');
@@ -69,7 +78,7 @@ class Controller extends AttributeTypeController
     {
         $values = $this->getVariablesValue();
         $outputList = "<ul><li>Lat: " . $values['latitude'] .  "</li><li>Lng: " . $values['longitude'] . "</li></ul>";
-        return $outputList;
+        return $values;
     }
 
     /**
@@ -105,6 +114,18 @@ class Controller extends AttributeTypeController
      */
     public function searchForm($list)
     {
+        $akHandle = $this->attributeKey->getAttributeKeyHandle();
+        $address = $this->request("address");
+        if ($address){
+            $list->filter("ak_" . $akHandle . "_address", "%" . $address . "%", "like");
+        }
+        return $list;
+    }
+
+    public function search() {
+        $this->form();
+        $v = $this->getView();
+        $v->render(new \Concrete\Core\Attribute\Context\BasicFormContext());
     }
 
     /**

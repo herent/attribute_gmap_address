@@ -3,14 +3,13 @@ defined('C5_EXECUTE') or die('Access Denied.');
 $uniq = uniqid();
 $lat  = strlen($values['latitude']) > 0 ? $values['latitude'] : "44.9603951";
 $lng  = strlen($values['longitude']) > 0 ? $values['longitude'] : "-93.226847";
-ob_start();
 ?>
 <style type="text/css">
     #map<?= $uniq; ?> {
         width: 100%;
         height: 200px;
     }
-    #address<?= $uniq; ?> {
+    #address {
         width: 100%;
         z-index: 1000;
     }
@@ -27,7 +26,7 @@ ob_start();
     <input type="text" 
            name="<?= $this->field('address');?>"
            value="<?= $values['address'];?>"
-           id="address<?= $uniq; ?>">
+           id="address">
 </div>
 <div id="map<?= $uniq; ?>"></div>
 <script type="text/javascript">
@@ -40,7 +39,8 @@ ob_start();
                 zoom: 18,
                 disableDefaultUI: true,
                 zoomControl: true,
-                mapTypeControl: true
+                mapTypeControl: true,
+                scrollwheel: false
             };
             map = new google.maps.Map(document.getElementById("map<?= $uniq; ?>"), mapOptions);
     <?php if (!isset($values["address"])) { ?>
@@ -88,7 +88,7 @@ ob_start();
             });
             updatePosition(marker.getPosition());
     <?php } ?>
-            var input = document.getElementById("address<?= $uniq; ?>");
+            var input = document.getElementById("address");
             var autocomplete = new google.maps.places.Autocomplete(input);
 
             google.maps.event.addListener(autocomplete, "place_changed", function () {
@@ -121,29 +121,4 @@ ob_start();
                 );
             }
         }
-
-//        $(document).ready(function(){
-//            if (google){
-//                initMap();
-//            }
-//        });
 </script>
-
-<?php
-$formCode = ob_get_clean();
-
-// replace attribute values
-$formCode = preg_replace_callback(
-    '/\[ATTRIBUTE_VALUE\(([a-zA-Z0-9]+)\)\]/', function ($matches) use ($values) {
-    return isset($values[$matches[1]]) ? $values[$matches[1]] : '';
-}, $formCode
-);
-
-// replace attribute names
-$formCode = preg_replace_callback(
-    '/\[ATTRIBUTE\(([a-zA-Z0-9]+)\)\]/', function ($matches) {
-    return $this->field($matches[1]);
-}, $formCode
-);
-
-echo $formCode;
